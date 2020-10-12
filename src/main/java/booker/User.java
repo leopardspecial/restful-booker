@@ -1,10 +1,7 @@
 package booker;
 
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 import lombok.experimental.Accessors;
 
 @Data
