@@ -1,20 +1,20 @@
 package booker_test;
 
+import booker.Guest;
 import booker.RestfulBooker;
 import booker.User;
+import com.google.gson.Gson;
 import cucumber.api.java.ru.Дано;
 import cucumber.api.java.ru.Когда;
 import cucumber.api.java.ru.То;
-
-import java.util.NoSuchElementException;
 
 
 public class BookerTest {
 
     private User user;
     private int bookingId;
-    private String guestBody;
     private RestfulBooker restfulBooker;
+    private Guest guest;
 
 
     @Дано("^Инициализация Restful boker$")
@@ -29,34 +29,27 @@ public class BookerTest {
 
     @Когда("^пользователь создаёт структуру бронирования$")
     public void createGuestBody(String guestBody) {
-        this.guestBody = guestBody;
+        Gson gson = new Gson();
+        guest = gson.fromJson(guestBody, Guest.class);
     }
 
     @Дано("^пользователь проходит авторизацию и получает токен$")
     public void authorization() {
-        user.setToken(restfulBooker.autorisation(user));
+        user.setToken(restfulBooker.authorise(user));
     }
 
     @Когда("^пользователь подтверждает бронирование$")
     public void createBooking() {
-        bookingId = restfulBooker.createBooking(guestBody);
+        bookingId = restfulBooker.createBooking(guest);
     }
 
     @То("^пользователь получает подтверждение существования заказа$")
     public void chekoutBooking() {
-        String responseFirstName = restfulBooker.getFirstNameOfGuestById(bookingId);
-
-        String responseLastName = restfulBooker.getLastNameOfGuestById(bookingId);
-
-        String responseAditionalneeds = restfulBooker.getAditionalNeedsOfGuestById(bookingId);
-
-        if (guestBody.contains(responseFirstName) && (guestBody.contains(responseLastName))
-                && (guestBody.contains(responseAditionalneeds))) {
+        if (guest.equals(restfulBooker.getGuestById(bookingId))) {
             System.out.println("Это то самое бронирование!");
         } else {
-            throw new NoSuchElementException();
+            throw new RuntimeException("Это не то бронирование");
         }
-
     }
 
 }

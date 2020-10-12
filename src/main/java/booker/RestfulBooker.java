@@ -4,11 +4,11 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 
 public class RestfulBooker {
-    private final String baseUri = "https://restful-booker.herokuapp.com/";
+    private final String BASE_URI = "https://restful-booker.herokuapp.com/";
 
-    public String autorisation(User user) {
+    public String authorise(User user) {
         return RestAssured.given()
-                .baseUri(baseUri)
+                .baseUri(BASE_URI)
                 .contentType(ContentType.JSON)
                 .body(user)
                 .when()
@@ -21,11 +21,11 @@ public class RestfulBooker {
                 .getString("token");
     }
 
-    public int createBooking(String guestBody) {
+    public int createBooking(Guest guest) {
         return RestAssured.given()
                 .contentType(ContentType.JSON)
-                .baseUri(baseUri)
-                .body(guestBody)
+                .baseUri(BASE_URI)
+                .body(guest)
                 .when()
                 .post("booking")
                 .then()
@@ -37,9 +37,9 @@ public class RestfulBooker {
                 .getInt("bookingid");
     }
 
-    public String getFirstNameOfGuestById(int bookingId) {
-        return RestAssured.given()
-                .baseUri(baseUri)
+    public Guest getGuestById(int bookingId) {
+        Guest guest = RestAssured.given()
+                .baseUri(BASE_URI)
                 .when()
                 .get("booking/" + bookingId)
                 .then()
@@ -47,32 +47,8 @@ public class RestfulBooker {
                 .extract()
                 .response()
                 .jsonPath()
-                .getString("firstname");
+                .getObject("", Guest.class);
+        return guest;
     }
 
-    public String getLastNameOfGuestById(int bookingId) {
-        return RestAssured.given()
-                .baseUri(baseUri)
-                .when()
-                .get("booking/" + bookingId)
-                .then()
-                .statusCode(200)
-                .extract()
-                .response()
-                .jsonPath()
-                .getString("lastname");
-    }
-
-    public String getAditionalNeedsOfGuestById(int bookingId) {
-        return RestAssured.given()
-                .baseUri(baseUri)
-                .when()
-                .get("booking/" + bookingId)
-                .then()
-                .statusCode(200)
-                .extract()
-                .response()
-                .jsonPath()
-                .getString("additionalneeds");
-    }
 }
